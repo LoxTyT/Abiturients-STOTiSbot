@@ -93,21 +93,21 @@ def documents(call):
 # Обработчик для отправки файлов по кнопкам
 @bot.callback_query_handler(func=lambda call: call.data == "obrazec_obchejitie")
 def send_file_1(call):
-    file_path = "files/Образец заявления на место в общежитии.pdf"  # Укажите путь к вашему файлу
+    file_path = "files/Образец заявления на место в общежитии.pdf"
     bot.send_document(call.message.chat.id, open(file_path, 'rb'))
     bot.answer_callback_query(call.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "zayavlenie_zaochnoe")
 def send_file_2(call):
-    file_path = "files/Образец заявления на обучение по программам СПО (заочное).pdf"  # Укажите путь к вашему файлу
+    file_path = "files/Образец заявления на обучение по программам СПО (заочное).pdf"
     bot.send_document(call.message.chat.id, open(file_path, 'rb'))
     bot.answer_callback_query(call.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "zayavlenie_ochnoe")
 def send_file_3(call):
-    file_path = "files/Образец заявления на обучение по программам СПО (очное).pdf"  # Укажите путь к вашему файлу
+    file_path = "files/Образец заявления на обучение по программам СПО (очное).pdf"
     bot.send_document(call.message.chat.id, open(file_path, 'rb'))
     bot.answer_callback_query(call.id)
 
@@ -328,7 +328,7 @@ def faq(call):
         "<b>3. Когда начинаются вступительные экзамены?</b>\nОтвет: Экзамены начинаются с 1 июля."
     )
     markup = types.InlineKeyboardMarkup(row_width=1)
-    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
     markup.add(back_button)
 
     bot.answer_callback_query(call.id)
@@ -346,7 +346,7 @@ def contacts(call):
         "Адрес: Сахалинская область, г. Холмск, ул. Победы, 10"
     )
     markup = types.InlineKeyboardMarkup(row_width=1)
-    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
     markup.add(back_button)
 
     bot.answer_callback_query(call.id)
