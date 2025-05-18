@@ -24,7 +24,10 @@ def create_main_keyboard():
     item6 = types.InlineKeyboardButton("Контакты", callback_data="contacts")
     item7 = types.InlineKeyboardButton("Вступительные экзамены", callback_data="exams")
     item8 = types.InlineKeyboardButton("Контрольные цифры приёма", callback_data="admission_numbers")
-    return markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
+    item9 = types.InlineKeyboardButton("Информация об общежитии", callback_data="dormitory_info")
+    item10 = types.InlineKeyboardButton("Онлайн приём", url="https://stotis.sakhalin.gov.ru/abitur/onlayn-zayavka-na-postuplenie-v-stotis/")
+    item11 = types.InlineKeyboardButton("Правила приёма", callback_data="admission_rules")
+    return markup.add(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11)
 
 # Обработчик команды /start
 @bot.message_handler(commands=['start'])
@@ -379,6 +382,69 @@ def admission_numbers(call):
     bot.answer_callback_query(call.id)
     bot.edit_message_text("Таблица с контрольными цифрами приёма:", chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup)
+
+    # Обработчик кнопки "Информация об общежитии"
+    @bot.callback_query_handler(func=lambda call: call.data == "dormitory_info")
+    def dormitory_info(call):
+        dormitory_text = (
+            "<b>Общежитие ГБПОУ «Сахалинский техникум отраслевых технологий и сервиса»</b>\n\n"
+            "Информация об общежитии:"
+            " 21 апреля 2018 года было сдано в эксплуатацию четырехэтажное здание нового общежития, которое рассчитано на 150 мест.\n"
+            "Общая площадь новостроя составляет более 3 тысяч квадратных метров.  Для студентов созданы все условия для комфортного проживания, продуктивного отдыха и успешной учебы.\n"
+            "На первом этаже, помимо бытовых помещений (душевых, санузлов, раздевалок, камер хранения, кладовых) размещены кабинеты для персонала, комната для проведения культурно – воспитательных мероприятий и комната для самостоятельных занятий, оборудованная компьютерами. К услугам студентов тренажерный зал, медицинские кабинеты (процедурный, кабинет врача, палаты - изоляторы).\n"
+            " Жилые блоки разделены на 3-4 секции, построенные по квартирному типу. В каждой секции (на 10 и на 20 человек) предусмотрены жилые комнаты, санузел, душевая и полностью оборудованная кухня (на этаже их три).  Большие секции выходят на просторную застекленную лоджию. На каждом этаже также имеются гладильные, постирочные и комнаты для сушки белья. \n"
+            "\nОбщежитие находится по адресу:\n"
+            "<b>г. Холмск ул. Советская, 80А (в пяти минутах ходьбы от автовокзала).</b>\n\n"
+            "Проезд от железнодорожной станции любым городским автобусом или маршрутным такси.\n"
+            "На 2025-2026 учебный год в общежитии для иногородних поступающих выделено 48 места."
+        )
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        virtual_tour_button = types.InlineKeyboardButton("Виртуальная экскурсия",
+                                                         url="https://www.youtube.com/watch?v=suTa0rIhbcs")
+        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+        markup.add(virtual_tour_button, back_button)
+
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(dormitory_text, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              reply_markup=markup, parse_mode="HTML")
+
+    # Обработчик кнопки "Правила приёма"
+    @bot.callback_query_handler(func=lambda call: call.data == "admission_rules")
+    def admission_rules(call):
+        rules_text = (
+            "<b>Правила приёма в ГБПОУ «Сахалинский техникум отраслевых технологий и сервиса»:</b>\n\n"
+        )
+
+        # Создаем клавиатуру с кнопками для отправки файлов
+        markup = types.InlineKeyboardMarkup(row_width=1)
+
+        file_button_1 = types.InlineKeyboardButton(
+            "Приказ от 29.06.2023 г.  № 094/10-ОД", callback_data="file_1"
+        )
+        file_button_2 = types.InlineKeyboardButton(
+            "Правила приема на 2025-2026 уч. год", callback_data="file_2"
+        )
+
+        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+
+        markup.add(file_button_1, file_button_2, back_button)
+
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(rules_text, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              reply_markup=markup, parse_mode="HTML")
+
+    # Обработчики для отправки файлов
+    @bot.callback_query_handler(func=lambda call: call.data == "file_1")
+    def send_file_1(call):
+        file_path = "files/Приказ от 29.06.2023 г.pdf"
+        bot.send_document(call.message.chat.id, open(file_path, 'rb'))
+        bot.answer_callback_query(call.id)
+
+    @bot.callback_query_handler(func=lambda call: call.data == "file_2")
+    def send_file_2(call):
+        file_path = "files/Правила приема на 2025-2026  уч. год.pdf"
+        bot.send_document(call.message.chat.id, open(file_path, 'rb'))
+        bot.answer_callback_query(call.id)
 
 # Запуск бота
 bot.polling(none_stop=True)
