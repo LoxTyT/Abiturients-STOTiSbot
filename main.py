@@ -5,12 +5,22 @@ from telebot import types
 TOKEN = "7635930726:AAGtZJCZNuioKevgOcSciNPj_RYPAZmFvCA"
 bot = telebot.TeleBot(TOKEN)
 
+# Обработчик кнопки "Вернуться в главное меню"
+@bot.callback_query_handler(func=lambda call: call.data == "back_to_main")
+def back_to_main(call):
+    markup = create_main_keyboard()  # Создаем клавиатуру для главного меню
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text("Выберите одну из опций:", chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
+
 # Функция для создания клавиатуры для главного меню
 def create_main_keyboard():
     markup = types.InlineKeyboardMarkup(row_width=2)
     item1 = types.InlineKeyboardButton("Список документов для поступления", callback_data="documents")
     item2 = types.InlineKeyboardButton("Сроки подачи документов", callback_data="deadlines")
-    return markup.add(item1, item2,)
+    item3 = types.InlineKeyboardButton("Информация о специальностях", callback_data="specialties")
+    item4 = types.InlineKeyboardButton("Сайт техникума", url="https://stotis.sakhalin.gov.ru/")
+    return markup.add(item1, item2, item3, item4,)
 
 # Обработчик команды /start
 @bot.message_handler(commands=['start'])
@@ -64,7 +74,7 @@ def documents(call):
     file_button_3 = types.InlineKeyboardButton("Образец заявления на обучение по программам СПО (очное)",
                                                callback_data="zayavlenie_ochnoe")
 
-    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
 
     markup.add(file_button_1, file_button_2, file_button_3, back_button)
 
@@ -100,11 +110,205 @@ def send_file_3(call):
 def deadlines(call):
     deadlines_info = "Сроки подачи документов: с 1 апреля по 15 июля."
     markup = types.InlineKeyboardMarkup(row_width=1)
-    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
     markup.add(back_button)
 
     bot.answer_callback_query(call.id)
     bot.edit_message_text(deadlines_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
+
+# Функция для создания клавиатуры для выбора специальностей
+def create_specialty_keyboard():
+    markup = types.InlineKeyboardMarkup(row_width=3)
+    item1 = types.InlineKeyboardButton("1 - 38.02.04 Коммерция (по отраслям)", callback_data="specialty_1")
+    item2 = types.InlineKeyboardButton("2 - 43.02.15 Поварское и кондитерское дело", callback_data="specialty_2")
+    item3 = types.InlineKeyboardButton("3 - 43.01.09 Повар, кондитер", callback_data="specialty_3")
+    item4 = types.InlineKeyboardButton("4 - 38.02.08 Торговое дело", callback_data="specialty_4")
+    item5 = types.InlineKeyboardButton("5 - 22.02.06 Сварочное производство", callback_data="specialty_1")
+    item6 = types.InlineKeyboardButton("6 - 15.02.19 Сварочное производство", callback_data="specialty_2")
+    item7 = types.InlineKeyboardButton("7 - 15.02.10 Мехатроника и мобильная робототехника",
+                                       callback_data="specialty_3")
+    item8 = types.InlineKeyboardButton("8 - 15.02.10 Мехатроника и робототехника (по отраслям)",
+                                       callback_data="specialty_4")
+    item9 = types.InlineKeyboardButton("9 - 10.02.05 Организация и технология защиты информации",
+                                       callback_data="specialty_1")
+    item10 = types.InlineKeyboardButton("10 - 10.02.05 Обеспечение информационной безопасности",
+                                        callback_data="specialty_2")
+    item11 = types.InlineKeyboardButton("11 - 09.02.07 Информационные системы и программирование",
+                                        callback_data="specialty_3")
+    item12 = types.InlineKeyboardButton("12 - 15.01.05 Сварщик (ручной и частично механизированной сварки",
+                                        callback_data="specialty_4")
+    item13 = types.InlineKeyboardButton("13 - 15.01.05 Сварщик (ручной и частично механизированной сварки",
+                                        callback_data="specialty_1")
+    item14 = types.InlineKeyboardButton(
+        "14 - 08.01.26 Мастер по ремонту и обслуживанию инженерных систем ЖКХ 2020-2022",
+        callback_data="specialty_2")
+    item15 = types.InlineKeyboardButton("15 - 08.01.29 Мастер по ремонту и обслуживанию инженерных систем ЖКХ 2023",
+                                        callback_data="specialty_3")
+    item16 = types.InlineKeyboardButton(
+        "16 - 23.02.07 Техническое обслуживание и ремонт двигателей, систем и агрегатов автомобилей",
+        callback_data="specialty_4")
+    markup.add(item1, item9)
+    markup.add(item2, item10)
+    markup.add(item3, item11)
+    markup.add(item4, item12)
+    markup.add(item5, item13)
+    markup.add(item6, item14)
+    markup.add(item7, item15)
+    markup.add(item8, item16)
+    return markup
+
+# Обработчик кнопки "Информация о специальностях"
+@bot.callback_query_handler(func=lambda call: call.data == "specialties")
+def specialties(call):
+    specialties_info = (
+        "На текущий год доступны следующие специальности:\n"
+        "1. 38.02.04 Коммерция (по отраслям)\n"
+        "2. 43.02.15 Поварское и кондитерское дело\n"
+        "3. 43.01.09 Повар, кондитер\n"
+        "4. 38.02.08 Торговое дело\n"
+        "5. 22.02.06 Сварочное производство\n"
+        "6. 15.02.19 Сварочное производство\n"
+        "7. 15.02.10 Мехатроника и мобильная робототехника\n"
+        "8. 15.02.10 Мехатроника и робототехника (по отраслям)\n"
+        "9. 10.02.05 Организация и технология защиты информации\n"
+        "10. 10.02.05 Обеспечение информационной безопасности\n"
+        "11. 09.02.07 Информационные системы и программирование\n"
+        "12. 15.01.05 Сварщик (ручной и частично механизированной сварки\n"
+        "13. 15.01.05 Сварщик (ручной и частично механизированной сварки\n"
+        "14. 08.01.26 Мастер по ремонту и обслуживанию инженерных систем ЖКХ 2020-2022\n"
+        "15. 08.01.29 Мастер по ремонту и обслуживанию инженерных систем ЖКХ 2023\n"
+        "16. 23.02.07 Техническое обслуживание и ремонт двигателей, систем и агрегатов автомобилей\n"
+    )
+    markup = create_specialty_keyboard()  # Создаем клавиатуру для выбора специальности
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+    markup.add(back_button)
+
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(specialties_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
+
+# Обработчик выбора специальности
+@bot.callback_query_handler(func=lambda call: call.data.startswith("specialty_"))
+def specialty_details(call):
+    if call.data == "specialty_1":
+        details = ("Наименование квалификации базовой подготовки: "
+                   "Менеджер по продажам."
+                   "Важным звеном торговой деятельности является менеджер по продажам. Эта специальность в современной экономической системе оказалась чрезвычайно популярной и востребованной. За иностранным названием скрыто интересное ремесло, порой граничащее с виртуозным искусством.")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/kommertsiya-po-otraslyam/")
+    elif call.data == "specialty_2":
+        details = "Специалист по поварскому и кондитерскому делу – это организатор процесса приготовления блюд, кондитерских изделий сложного ассортимента и квалифицированный повар. Профессии: пекарь, повар, кондитер занимают 29 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/pkd/")
+    elif call.data == "specialty_3":
+        details = "Профессии: пекарь, повар, кондитер занимают 29 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/pk/pk.php")
+    elif call.data == "specialty_4":
+        details = "Внимание! Образовательная программа по специальности 38.02.08 \"Торговое дело\" является одной из наиболее востребованных и перспективных в современном бизнесе. Профессиональный путь, связанный с этой областью, предоставляет широкий спектр возможностей для карьерного роста и развития."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/trading-business/trading-business.php")
+    elif call.data == "specialty_5":
+        details = (
+            "Техник сварочного производства на протяжении десятилетий является одной из стабильно востребованных профессий. "
+            "Специалист сварочного производства занимает 56 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831).")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/sp/sp.php")
+    elif call.data == "specialty_6":
+        details = ("Программа реализуется с 2024 года в рамках Федеральной программы \"Профессионалитет\"."
+                   "Наименование квалификации базовой подготовки специалиста среднего звена:"
+                   "Техник."
+                   "Сварочные работы по востребованности находятся на первых семи позициях, а их качественное выполнение гарантирует высокую оплату и возможность карьерного роста."
+                   "Специалист сварочного производства занимает 56 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831).")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/15-02-19-svarochnoe-proizvodstvo/")
+    elif call.data == "specialty_7":
+        details = "Специалист по мехатронике и мобильной робототехнике занимает 43 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/mimr/mimr.php")
+    elif call.data == "specialty_8":
+        details = ("Наименование квалификации специалиста среднего звена:"
+                   "Специалист по мехатронике и робототехнике."
+                   "Специалист по робототехнике — это высококвалифицированный специалист, который занимается проектированием, разработкой, программированием и обслуживанием роботизированных систем, которые могут выполнять задачи автономно или с помощью человека.")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/mekhatronika-i-robototekhnika-po-otraslyam/")
+    elif call.data == "specialty_9":
+        details = (
+            "Техник по защите информации это специалист, который занимается обеспечением информационной безопасности предприятия и его информационной инфраструктуры, техническим обслуживанием средств защиты информации."
+            "Специалист по информационной безопасности занимает 40 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831).")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/otzi1-16/")
+    elif call.data == "specialty_10":
+        details = "Специалист по информационной безопасности занимает 40 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/oib/oib.php")
+    elif call.data == "specialty_11":
+        details = (
+            "Информационные системы и программирование - на сегодняшний день одна из самых приоритетных специальностей. Квалификация, которая будет получена в результате обучения."
+            "Специалист по информационным системам и программированию занимает 41 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831).")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/isip/isip.php")
+    elif call.data == "specialty_12":
+        details = "Сварщик – специалист по металлу, который соединяет металлические детали в сложные конструкции при помощи электрической или газовой сварки. Профессия сварщик занимает 56 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/sv/sv.php")
+    elif call.data == "specialty_13":
+        details = ("Квалификация квалифицированного рабочего, служащего:  "
+                   "сварщик."
+                   "Сварщик – специалист по металлу, который соединяет металлические детали в сложные конструкции при помощи электрической или газовой сварки. Профессия сварщик занимает 56 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831).")
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/15-01-05-svarshchik-elektrosvarochnye-i-gazosvarochnye-raboty/")
+    elif call.data == "specialty_14":
+        details = "Мастер по ремонту и обслуживанию инженерных систем ЖКХ - это специалист-универсал широкого профиля, занимающийся организацией эксплуатации зданий, сооружений, конструкций, оборудования систем водоснабжения, водоотведения, отопления и осветительных сетей ЖКХ и их ремонтом."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/mrois/mrois.php")
+    elif call.data == "specialty_15":
+        details = "Мастер по ремонту и обслуживанию инженерных систем ЖКХ - это специалист-универсал широкого профиля, занимающийся организацией ремонта, монтажа и эксплуатацией оборудования систем водоснабжения, водоотведения, отопления и осветительных сетей ЖКХ."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/mrois2023/")
+    elif call.data == "specialty_16":
+        details = "Техническое обслуживание и ремонт двигателей и агрегатов автомобилей – специальность, выпускник которой владеет навыками не только грамотной эксплуатации автомобилей, но и может организовывать технологические процессы обслуживания и ремонта. Мастер по ремонту и обслуживанию автомобилей занимает 16 место в списке наиболее востребованных на рынке труда, новых и перспективных профессий, требующих среднего профессионального образования (приказ Минтруда России и соцзащиты РФ от 30.12.2022 г. №831)."
+        more_info_button = types.InlineKeyboardButton("Подробнее",
+                                                      url="https://stotis.sakhalin.gov.ru/spetsialnosti-i-professii-stotis/tord/tord.php")
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    back_button = types.InlineKeyboardButton("Вернуться к списку специальностей",
+                                             callback_data="back_to_specialties")
+    markup.add(more_info_button, back_button)
+
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(details, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
+
+# Обработчик кнопки "Вернуться к списку специальностей"
+@bot.callback_query_handler(func=lambda call: call.data == "back_to_specialties")
+def back_to_specialties(call):
+    specialties_info = (
+        "На текущий год доступны следующие специальности:\n"
+        "1. 38.02.04 Коммерция (по отраслям)\n"
+        "2. 43.02.15 Поварское и кондитерское дело\n"
+        "3. 43.01.09 Повар, кондитер\n"
+        "4. 38.02.08 Торговое дело\n"
+        "5. 22.02.06 Сварочное производство\n"
+        "6. 15.02.19 Сварочное производство\n"
+        "7. 15.02.10 Мехатроника и мобильная робототехника\n"
+        "8. 15.02.10 Мехатроника и робототехника (по отраслям)\n"
+        "9. 10.02.05 Организация и технология защиты информации\n"
+        "10. 10.02.05 Обеспечение информационной безопасности\n"
+        "11. 09.02.07 Информационные системы и программирование\n"
+        "12. 15.01.05 Сварщик (ручной и частично механизированной сварки\n"
+        "13. 15.01.05 Сварщик (ручной и частично механизированной сварки\n"
+        "14. 08.01.26 Мастер по ремонту и обслуживанию инженерных\n"
+        "15. 08.01.29 Мастер по ремонту и обслуживанию инженерных\n"
+        "16. 23.02.07 Техническое обслуживание и ремонт двигателей, систем и агрегатов автомобилей\n"
+    )
+    markup = create_specialty_keyboard()  # Пересоздаем клавиатуру для выбора специальности
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+    markup.add(back_button)
+
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(specialties_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup)
 
 # Запуск бота
