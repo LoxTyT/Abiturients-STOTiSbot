@@ -22,7 +22,9 @@ def create_main_keyboard():
     item4 = types.InlineKeyboardButton("Сайт техникума", url="https://stotis.sakhalin.gov.ru/")
     item5 = types.InlineKeyboardButton("FAQ", callback_data="faq")
     item6 = types.InlineKeyboardButton("Контакты", callback_data="contacts")
-    return markup.add(item1, item2, item3, item4, item5, item6)
+    item7 = types.InlineKeyboardButton("Вступительные экзамены", callback_data="exams")
+    item8 = types.InlineKeyboardButton("Контрольные цифры приёма", callback_data="admission_numbers")
+    return markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
 
 # Обработчик команды /start
 @bot.message_handler(commands=['start'])
@@ -313,40 +315,70 @@ def back_to_specialties(call):
     bot.edit_message_text(specialties_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup)
 
-    # Обработчик кнопки "FAQ"
-    @bot.callback_query_handler(func=lambda call: call.data == "faq")
-    def faq(call):
-        faq_text = (
-            "FAQ:\n\n"
-            "<b>1. Как подать документы?</b>\nОтвет: Для подачи документов заполните онлайн-форму на сайте техникума.\n\n"
-            "<b>2. Какие документы нужны для поступления?</b>\nОтвет: Для поступления необходимы паспорт, аттестат, фото и медицинская справка.\n\n"
-            "<b>3. Когда начинаются вступительные экзамены?</b>\nОтвет: Экзамены начинаются с 1 июля."
-        )
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
-        markup.add(back_button)
+# Обработчик кнопки "FAQ"
+@bot.callback_query_handler(func=lambda call: call.data == "faq")
+def faq(call):
+    faq_text = (
+        "FAQ:\n\n"
+        "<b>1. Как подать документы?</b>\nОтвет: Для подачи документов заполните онлайн-форму на сайте техникума.\n\n"
+        "<b>2. Какие документы нужны для поступления?</b>\nОтвет: Для поступления необходимы паспорт, аттестат, фото и медицинская справка.\n\n"
+        "<b>3. Когда начинаются вступительные экзамены?</b>\nОтвет: Экзамены начинаются с 1 июля."
+    )
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    markup.add(back_button)
 
-        bot.answer_callback_query(call.id)
-        bot.edit_message_text(faq_text, chat_id=call.message.chat.id, message_id=call.message.message_id,
-                              reply_markup=markup, parse_mode="HTML")
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(faq_text, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup, parse_mode="HTML")
 
-    # Обработчик кнопки "Контакты"
-    @bot.callback_query_handler(func=lambda call: call.data == "contacts")
-    def contacts(call):
-        contact_info = (
-            "Контакты:\n\n"
-            "Телефон: 8 (42433) 2-09-82, 5-26-81\n"
-            "Факс: 8 (42433)-66-401\n"
-            "E-mail: stotis@sakhalin.gov.ru\n"
-            "Адрес: Сахалинская область, г. Холмск, ул. Победы, 10"
-        )
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
-        markup.add(back_button)
+# Обработчик кнопки "Контакты"
+@bot.callback_query_handler(func=lambda call: call.data == "contacts")
+def contacts(call):
+    contact_info = (
+        "Контакты:\n\n"
+        "Телефон: 8 (42433) 2-09-82, 5-26-81\n"
+        "Факс: 8 (42433)-66-401\n"
+        "E-mail: stotis@sakhalin.gov.ru\n"
+        "Адрес: Сахалинская область, г. Холмск, ул. Победы, 10"
+    )
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+    markup.add(back_button)
 
-        bot.answer_callback_query(call.id)
-        bot.edit_message_text(contact_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
-                              reply_markup=markup)
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(contact_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
+
+# Обработчик кнопки "Вступительные экзамены"
+@bot.callback_query_handler(func=lambda call: call.data == "exams")
+def exams(call):
+    exams_info = (
+        "<b>Зачисление проводится без вступительных испытаний</b> \n\n"
+        "В случае,  если численность поступающих  превышает количество мест, будет проводиться отбор  по конкурсу аттестатов, на основе результатов освоения поступающими образовательной программы основного общего образования, указанных в представленных поступающими документах об образовании."
+    )
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+    markup.add(back_button)
+
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text(exams_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup, parse_mode="HTML")
+
+
+# Обработчик кнопки "Контрольные цифры приёма"
+@bot.callback_query_handler(func=lambda call: call.data == "admission_numbers")
+def admission_numbers(call):
+    # Отправка изображения с таблицей
+    bot.send_photo(call.message.chat.id, open("files/Контрольные цифры приёма.png", 'rb'))
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="back_to_main")
+    markup.add(back_button)
+
+    bot.answer_callback_query(call.id)
+    bot.edit_message_text("Таблица с контрольными цифрами приёма:", chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup)
 
 # Запуск бота
 bot.polling(none_stop=True)
