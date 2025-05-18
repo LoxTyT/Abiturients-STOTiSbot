@@ -20,7 +20,9 @@ def create_main_keyboard():
     item2 = types.InlineKeyboardButton("Сроки подачи документов", callback_data="deadlines")
     item3 = types.InlineKeyboardButton("Информация о специальностях", callback_data="specialties")
     item4 = types.InlineKeyboardButton("Сайт техникума", url="https://stotis.sakhalin.gov.ru/")
-    return markup.add(item1, item2, item3, item4,)
+    item5 = types.InlineKeyboardButton("FAQ", callback_data="faq")
+    item6 = types.InlineKeyboardButton("Контакты", callback_data="contacts")
+    return markup.add(item1, item2, item3, item4, item5, item6)
 
 # Обработчик команды /start
 @bot.message_handler(commands=['start'])
@@ -310,6 +312,41 @@ def back_to_specialties(call):
     bot.answer_callback_query(call.id)
     bot.edit_message_text(specialties_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup)
+
+    # Обработчик кнопки "FAQ"
+    @bot.callback_query_handler(func=lambda call: call.data == "faq")
+    def faq(call):
+        faq_text = (
+            "FAQ:\n\n"
+            "<b>1. Как подать документы?</b>\nОтвет: Для подачи документов заполните онлайн-форму на сайте техникума.\n\n"
+            "<b>2. Какие документы нужны для поступления?</b>\nОтвет: Для поступления необходимы паспорт, аттестат, фото и медицинская справка.\n\n"
+            "<b>3. Когда начинаются вступительные экзамены?</b>\nОтвет: Экзамены начинаются с 1 июля."
+        )
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+        markup.add(back_button)
+
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(faq_text, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              reply_markup=markup, parse_mode="HTML")
+
+    # Обработчик кнопки "Контакты"
+    @bot.callback_query_handler(func=lambda call: call.data == "contacts")
+    def contacts(call):
+        contact_info = (
+            "Контакты:\n\n"
+            "Телефон: 8 (42433) 2-09-82, 5-26-81\n"
+            "Факс: 8 (42433)-66-401\n"
+            "E-mail: stotis@sakhalin.gov.ru\n"
+            "Адрес: Сахалинская область, г. Холмск, ул. Победы, 10"
+        )
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        back_button = types.InlineKeyboardButton("Вернуться в главное меню", callback_data="main")
+        markup.add(back_button)
+
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(contact_info, chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              reply_markup=markup)
 
 # Запуск бота
 bot.polling(none_stop=True)
